@@ -1,7 +1,7 @@
 #ifndef PATH_H
 #define PATH_H
 
-char* path_resolve(char* base, char* child);
+void path_resolve(char* base, char* child, char* dest);
 
 char* path_normalize(char* path);
 

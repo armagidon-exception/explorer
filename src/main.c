@@ -1,6 +1,7 @@
 #include "fs.h"
 #include "path.h"
 #include "ui.h"
+#include <bits/getopt_core.h>
 #include <getopt.h>
 #include <linux/limits.h>
 #include <locale.h>
@@ -28,47 +29,38 @@ int parse_options(s_options *options, char **argv, int argc) {
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
   s_options options = {0};
-  if (parse_options(&options, argv, argc)) {
+  if (parse_options(&options, argv, argc))
     exit(EXIT_FAILURE);
-  }
 
-  char *rp = calloc(PATH_MAX + 1, sizeof(char));
-  realpath(argv[optind], rp);
+  char path[PATH_MAX + 1];
+  realpath(argv[optind], path);
 
-  ui_state *state = create_ui();
-  set_cwd(state, rp);
-  render_ui(state);
+  ui_state *state = initui();
+  set_cwd(state, path);
   while (1) {
+    render_ui(state);
     switch (getch()) {
     case 'k': {
       state->selected_item--;
-      render_ui(state);
     } break;
     case 'j': {
       state->selected_item++;
-      render_ui(state);
     } break;
     case '\n': {
       char *selected_item = get_selected_item(state);
-      if (is_dir(selected_item)) {
-        char *new_path = path_resolve(state->dir_list->dir_path, selected_item);
-        if (set_cwd(state, new_path)) {
-          free(new_path);
-          break;
-        }
-        render_ui(state);
-      } else if (is_file(selected_item)) {
-        char *filepath = path_resolve(state->dir_list->dir_path, selected_item);
-        open_file(filepath);
-        free(filepath);
-      }
+      char new_path[PATH_MAX + 1];
+      path_resolve(state->dir_list->dir_path, selected_item, new_path);
+
+      if (is_dir(new_path))
+        set_cwd(state, new_path);
+      else if (is_file(selected_item))
+        open_file(new_path);
     } break;
-    case 'q': {
-      close_ui(state);
-      exit(EXIT_SUCCESS);
-    } break;
+    case 'q':
+      goto stop_event_loop;
     }
   }
+  stop_event_loop:
 
   close_ui(state);
   exit(EXIT_SUCCESS);

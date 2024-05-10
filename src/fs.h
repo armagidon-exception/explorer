@@ -6,7 +6,7 @@
 
 typedef struct {
   char **dir_names;
-  int dir_count;
+  size_t dir_length;
   char* dir_path;
 } dir_list;
 
@@ -23,7 +23,6 @@ dir_list *read_dir(char *directory);
 void close_dir(dir_list *dir_list);
 
 bool is_dir(char* filename);
-
 
 bool is_file(char *filename);
 

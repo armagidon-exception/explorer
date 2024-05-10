@@ -1,4 +1,5 @@
 #include "fs.h"
+#include "utils.h"
 #include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
@@ -17,8 +18,6 @@ int make_dir(char *filename, bool make_parents) {
   if (!make_parents) {
     if (!mkdir(filename, 0700)) {
       printf("Created new directory %s\n", buf);
-    } else if (errno == EEXIST) {
-      return -1;
     } else {
       return -1;
     }
@@ -71,29 +70,37 @@ int open_file(char *filename) {
   return -1;
 }
 
-dir_list *read_dir(char *directory) {
-  DIR *dir = opendir(directory);
-  if (dir == NULL) {
-    return NULL;
-  }
-  dir_list *dl = malloc(sizeof(dir_list));
-  memset(dl, 0, sizeof(dir_list));
-  dl->dir_path = directory;
+static int get_dir_length(DIR *dir) {
   struct dirent *entry;
   int c = 0;
   while ((entry = readdir(dir)) != NULL)
     c++;
+  return c;
+}
+
+static dir_list *__make_dir_list(DIR *dir, char *path) {
+  dir_list *dl = malloc(sizeof(dir_list));
+  memset(dl, 0, sizeof(dir_list));
+  dl->dir_path = strtoheap(path);
+  dl->dir_length = get_dir_length(dir);
+  return dl;
+}
+
+dir_list *read_dir(char *directory) {
+  DIR *dir = opendir(directory);
+  if (dir == NULL)
+    return NULL;
+
+  dir_list *dl = __make_dir_list(dir, directory);
   rewinddir(dir);
-  if (c > 0) {
-    int index = 0;
-    dl->dir_names = calloc(c, sizeof(char *));
-    while ((entry = readdir(dir)) != NULL) {
-      int len = strlen(entry->d_name);
-      char *dir_name = calloc(len + 1, sizeof(char));
-      strcpy(dir_name, entry->d_name);
-      dl->dir_names[index++] = dir_name;
-    }
-    dl->dir_count = c;
+
+  if (dl->dir_length) {
+    dl->dir_names = calloc(dl->dir_length, sizeof(char *));
+
+    struct dirent *entry;
+    for (int index = 0; (entry = readdir(dir)) != NULL; index++)
+      dl->dir_names[index] = strtoheap(entry->d_name);
+
   }
   closedir(dir);
   return dl;
@@ -102,9 +109,10 @@ dir_list *read_dir(char *directory) {
 void close_dir(dir_list *dir_list) {
   if (dir_list == NULL)
     return;
-  for (int i = 0; i < dir_list->dir_count; i++) {
+
+  for (int i = 0; i < dir_list->dir_length; i++)
     free(dir_list->dir_names[i]);
-  }
+
   free(dir_list->dir_names);
   free(dir_list->dir_path);
   free(dir_list);

@@ -17,7 +17,7 @@ static void clear_line(int row) {
 static void highlight(ui_state *state, int item_index) {
 
   int max_x = getmaxx(stdscr);
-  if (item_index >= state->dir_list->dir_count || item_index < 0) {
+  if (item_index >= state->dir_list->dir_length || item_index < 0) {
     return;
   }
   char *dir_name = state->dir_list->dir_names[item_index];
@@ -33,7 +33,7 @@ static void highlight(ui_state *state, int item_index) {
   set_cursor(0, item_index);
 }
 
-ui_state *create_ui() {
+ui_state *initui() {
   ui_state *state = malloc(sizeof(ui_state));
   memset(state, 0, sizeof(ui_state));
   initscr();
@@ -80,7 +80,7 @@ void render_top_bar(ui_state *state) {
 
 void render_ui(ui_state *state) {
   clear();
-  for (int i = 0; i < state->dir_list->dir_count; i++) {
+  for (int i = 0; i < state->dir_list->dir_length; i++) {
     set_cursor(0, i);
     addstr(state->dir_list->dir_names[i]);
   }

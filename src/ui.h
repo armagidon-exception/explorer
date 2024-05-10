@@ -8,7 +8,7 @@ typedef struct {
   int selected_item;
 } ui_state;
 
-ui_state* create_ui();
+ui_state* initui();
 
 void select_item(ui_state* state, int item_index);
 

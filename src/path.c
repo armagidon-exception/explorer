@@ -14,18 +14,15 @@ int last_index_of(char *string, char c, int start) {
   return -1;
 }
 
-char *path_resolve(char *base, char *child) {
-  char buf[PATH_MAX + 1];
+void path_resolve(char *base, char *child, char* dest) {
   int base_len = strlen(base);
   int child_len = strlen(child);
-  strcpy(buf, base);
+  strcpy(dest, base);
   if (base[base_len - 1] != '/') {
-    buf[base_len++] = '/';
+    dest[base_len++] = '/';
   }
   for (int i = 0; i <= child_len; i++) {
-    buf[i + base_len] = child[i];
+    dest[i + base_len] = child[i];
   }
-  char *out = calloc(PATH_MAX + 1, sizeof(char));
-  realpath(buf, out);
-  return out;
+  realpath(dest, dest);
 }
