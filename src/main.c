@@ -1,6 +1,7 @@
 #include "fs.h"
 #include "path.h"
 #include "ui.h"
+#include "utils.h"
 #include <bits/getopt_core.h>
 #include <getopt.h>
 #include <linux/limits.h>
@@ -41,10 +42,27 @@ int main(int argc, char **argv) {
     render_ui(state);
     switch (getch()) {
     case 'k': {
-      state->selected_item--;
+      if (state->selected_item > state->view_offset) {
+        state->selected_item--;
+      } else if (state->selected_item == state->view_offset &&
+                 state->view_offset > 0) {
+        state->selected_item--;
+        state->view_offset--;
+      }
     } break;
     case 'j': {
-      state->selected_item++;
+      if (state->selected_item <
+          min(get_dir_length(state),
+              get_view_size(state) + state->view_offset) -
+              1) {
+        state->selected_item++;
+      } else if (state->selected_item ==
+                     get_view_size(state) + state->view_offset - 1 &&
+                 state->view_offset <
+                     get_dir_length(state) - get_view_size(state)) {
+        state->selected_item++;
+        state->view_offset++;
+      }
     } break;
     case '\n': {
       char *selected_item = get_selected_item(state);
@@ -60,8 +78,7 @@ int main(int argc, char **argv) {
       goto stop_event_loop;
     }
   }
-  stop_event_loop:
-
+stop_event_loop:
   close_ui(state);
   exit(EXIT_SUCCESS);
 }

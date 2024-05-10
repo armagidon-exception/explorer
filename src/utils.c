@@ -7,3 +7,6 @@ char *strtoheap(char *str) {
   strcpy(buf, str);
   return buf;
 }
+
+
+int min(int a, int b) { return a < b ? a : b; }
