@@ -1,14 +1,42 @@
-explorer: build/main.o build/fs.o
-	mkdir -p bin
-	$(CC) -I src/fs.h $^ -o bin/$@
+CC=gcc
+CC_FLAGS=-g -Wall -Wl,-O1 -pipe -O2 -flto=2 -fno-fat-lto-objects -fuse-linker-plugin -fPIC -fsanitize=address
 
-build/main.o:
-	mkdir -p build
-	$(CC) -c $(LDFLAGS) $(CFLAGS) $(CPPFLAGS) src/main.c -o $@
+TARGET=explorer
 
-build/fs.o:
-	mkdir -p build
-	$(CC) -c $(LDFLAGS) $(CFLAGS) $(CPPFLAGS) src/fs.c -o $@
+SRC_DIR=src
+BIN_DIR=bin
+
+SOURCES=$(SRC_DIR)/*.c
+
+DEL_FILE      = rm -f
+CHK_DIR_EXISTS= test -d
+MKDIR         = mkdir -p
+COPY          = cp -f
+COPY_FILE     = cp -f
+COPY_DIR      = cp -f -R
+INSTALL_FILE  = install -m 644 -p
+INSTALL_PROGRAM = install -m 755 -p
+INSTALL_DIR   = cp -f -R
+DEL_FILE      = rm -f
+SYMLINK       = ln -f -s
+DEL_DIR       = rmdir
+MOVE          = mv -f
+TAR           = tar -cf
+COMPRESS      = gzip -9f
+LIBS_DIRS     = -I./include/
+LIBS 		  = $(LIBS_DIRS) -lncursesw
+SED           = sed
+STRIP         = strip
+
+.PHONY: clean build
+all: clean build
+
+build: $(SOURCE)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CC_FLAGS) $(LIBS) $(SOURCES) -o $(BIN_DIR)/$(TARGET)
+
+run:
+	./$(BIN_DIR)/$(TARGET)
 
 clean:
-	rm -rv build bin || exit 0
+	$(DEL_FILE) bin/*
