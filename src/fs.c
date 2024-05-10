@@ -86,6 +86,23 @@ static dir_list *__make_dir_list(DIR *dir, char *path) {
   return dl;
 }
 
+void lexicSort(dir_list *list) {
+  for (int i = 0; i < list->dir_length; i++) {
+    bool swapped = true;
+    for (int j = 0; j < list->dir_length - i - 1; j++) {
+      if (strcmp(list->dir_names[j], list->dir_names[j + 1]) > 0) {
+        char *temp = list->dir_names[j];
+        list->dir_names[j] = list->dir_names[j + 1];
+        list->dir_names[j + 1] = temp;
+        swapped = true;
+      }
+      if (!swapped) {
+        break;
+      }
+    }
+  }
+}
+
 dir_list *read_dir(char *directory) {
   DIR *dir = opendir(directory);
   if (dir == NULL)
@@ -100,9 +117,10 @@ dir_list *read_dir(char *directory) {
     struct dirent *entry;
     for (int index = 0; (entry = readdir(dir)) != NULL; index++)
       dl->dir_names[index] = strtoheap(entry->d_name);
-
   }
   closedir(dir);
+  lexicSort(dl);
+
   return dl;
 }
 
