@@ -1,5 +1,4 @@
 #include "fs.h"
-#include "utils.h"
 #include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
@@ -8,6 +7,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "filesystem.h"
 
 int make_dir(char *filename, bool make_parents) {
   int len = strlen(filename);
@@ -81,12 +81,12 @@ static int get_dir_length(DIR *dir) {
 static dir_list *__make_dir_list(DIR *dir, char *path) {
   dir_list *dl = malloc(sizeof(dir_list));
   memset(dl, 0, sizeof(dir_list));
-  dl->dir_path = strtoheap(path);
+  dl->dir_path = strdup(path);
   dl->dir_length = get_dir_length(dir);
   return dl;
 }
 
-void lexicSort(dir_list *list) {
+void lexic_sort(dir_list *list) {
   for (int i = 0; i < list->dir_length; i++) {
     bool swapped = true;
     for (int j = 0; j < list->dir_length - i - 1; j++) {
@@ -116,10 +116,10 @@ dir_list *read_dir(char *directory) {
 
     struct dirent *entry;
     for (int index = 0; (entry = readdir(dir)) != NULL; index++)
-      dl->dir_names[index] = strtoheap(entry->d_name);
+      dl->dir_names[index] = strdup(entry->d_name);
   }
   closedir(dir);
-  lexicSort(dl);
+  lexic_sort(dl);
 
   return dl;
 }

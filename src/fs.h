@@ -7,7 +7,7 @@
 typedef struct {
   char **dir_names;
   size_t dir_length;
-  char* dir_path;
+  char *dir_path;
 } dir_list;
 
 int make_dir(char *filename, bool make_parents);
@@ -22,7 +22,7 @@ dir_list *read_dir(char *directory);
 
 void close_dir(dir_list *dir_list);
 
-bool is_dir(char* filename);
+bool is_dir(char *filename);
 
 bool is_file(char *filename);
 

@@ -30,6 +30,6 @@ char *get_cwd();
 
 int get_view_size(ui_state *state);
 
-int get_dir_length(ui_state* state);
+int get_dir_length(ui_state *state);
 
 #endif /* end of include guard: UI_H */

@@ -24,7 +24,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 LIBS_DIRS     = -I./include/
-LIBS 		  = $(LIBS_DIRS) -lncursesw
+LIBS 		  = $(LIBS_DIRS) -lncursesw -lzip
 SED           = sed
 STRIP         = strip
 

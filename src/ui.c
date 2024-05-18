@@ -121,6 +121,7 @@ int set_cwd(ui_state *state, char *cwd) {
   return 0;
 }
 
+
 int get_view_size(ui_state *state) { return state->view_size; }
 
 int get_dir_length(ui_state *state) { return state->dir_list->dir_length; }
